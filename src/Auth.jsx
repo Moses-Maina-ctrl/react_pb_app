@@ -1,17 +1,41 @@
+import { useState } from "react";
 import pb from "./lib/pocketbase";
+import { useForm } from "react-hook-form";
+
 
 export default function Auth(){
+    const [isLoading, setLoading] = useState(false);
+    const { register, handleSubmit} = useForm();
+    const isLoggedIn = pb.authStore.isValid;
+    async function login(data){
+        setLoading(true);
+        try{
+        const authData = await pb.collection('users').authWithPassword(data.email, data.password);
+        console.log(data)
+        setLoading(false);
+        }catch(e){
+            alert(e)
+        }
+    }
+    if (isLoggedIn)
+        return(
+        <>
+            <h1>Logged In: {pb.authStore.model.email}</h1>
+            <button type="submit" onClick={pb.authStore.clear()}>Logout</button>
+        </>
+    );
     return(
     <>
+    {isLoading && <p>Loading...</p>}
     <h1>
-        Logged In: {pb.authStore.isValid.toString()};
-        <form>
-            <input type="text" placeholder="email"/>
-            <input type="password" placeholder="password"/>
+        Please Login </h1>
+        <form onSubmit={handleSubmit(login)}>
+            <input type="text" placeholder="email" {...register("email")}/>
+            <input type="password" placeholder="password" {...register("password")}/>
 
-            <button type="submit">Login</button>
+            <button type="submit" disabled ={isLoading}>{isLoading ? "Loading":"Login"}</button>
         </form>
-    </h1>
+    
     </>
     )
 }
