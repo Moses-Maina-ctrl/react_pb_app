@@ -1,27 +1,18 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import pb from "./lib/pocketbase";
 import { useForm } from "react-hook-form";
+import useLogout from "./hooks/useLogout";
+import useLogin from "./hooks/useLogin";
 
 
 export default function Auth(){
+    const logout = useLogout();
+    const login = useLogin();
     const [isLoading, setLoading] = useState(false);
-    const { register, handleSubmit} = useForm();
-    const [dummy, setDummy] = useState(0);
+    const { register, handleSubmit } = useForm();
     const isLoggedIn = pb.authStore.isValid;
-    async function login(data){
-        setLoading(true);
-        try{
-        const authData = await pb.collection('users').authWithPassword(data.email, data.password);
-        console.log(data)
-        }catch(e){
-            alert(e)
-        }
-        setLoading(false);
-    }
-    function logout(){
-        pb.authStore.clear();
-        setDummy(Math.random())
-    }
+
     if (isLoggedIn){
         return(
         <>
