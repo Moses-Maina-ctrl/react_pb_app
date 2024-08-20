@@ -6,24 +6,29 @@ import { useForm } from "react-hook-form";
 export default function Auth(){
     const [isLoading, setLoading] = useState(false);
     const { register, handleSubmit} = useForm();
+    const [dummy, setDummy] = useState(0);
     const isLoggedIn = pb.authStore.isValid;
     async function login(data){
         setLoading(true);
         try{
         const authData = await pb.collection('users').authWithPassword(data.email, data.password);
         console.log(data)
-        setLoading(false);
         }catch(e){
             alert(e)
         }
+        setLoading(false);
     }
-    if (isLoggedIn)
+    function logout(){
+        pb.authStore.clear();
+        setDummy(Math.random())
+    }
+    if (isLoggedIn){
         return(
         <>
             <h1>Logged In: {pb.authStore.model.email}</h1>
-            <button type="submit" onClick={pb.authStore.clear()}>Logout</button>
+          <button  onClick={logout}>Logout</button>
         </>
-    );
+    );}
     return(
     <>
     {isLoading && <p>Loading...</p>}
